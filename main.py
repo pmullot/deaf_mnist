@@ -25,19 +25,6 @@ def main():
             # print(err)
             print('no model available, get READY TO TRAIN ONE')
             X, X_test, Y, Y_test = gds.get_dataset()
-            """
-            (X_train, y_train), (X_test, y_test) = cifar10.load_data()
-
-            X_train = X_train.astype('float32')
-
-            X_test = X_test.astype('float32')
-            X_train = X_train / 255.0
-            X_test = X_test / 255.0
-            y_train = np_utils.to_categorical(y_train)
-
-            y_test = np_utils.to_categorical(y_test)
-            class_num = y_test.shape[1]
-            """
 
             print('normalizing images')
             X = tf.keras.utils.normalize(X, axis=1)
@@ -47,15 +34,6 @@ def main():
 
             print('building model')
             model = tf.keras.models.Sequential()
-            """
-            model.add(tf.keras.layers.Flatten())
-            model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
-            model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu6))
-            model.add(tf.keras.layers.Dense(10, activation=tf.nn.softmax))
-            model.compile(optimizer='adam',
-                        loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-            """
-            # model.add(tf.keras.layers.Flatten())
 
             model.add(tf.keras.layers.Conv2D(
                 32, (3, 3), input_shape=X.shape[1:], activation=tf.nn.relu6, padding='same'))
@@ -86,6 +64,11 @@ def main():
             model.add(tf.keras.layers.Dropout(0.2))
             model.add(tf.keras.layers.BatchNormalization())
 
+            model.add(tf.keras.layers.Dense(
+                64, kernel_constraint=tf.keras.constraints.MaxNorm(3), activation=tf.nn.relu6))
+            model.add(tf.keras.layers.Dropout(0.2))
+            model.add(tf.keras.layers.BatchNormalization())
+
             model.add(tf.keras.layers.Dense(10, activation=tf.nn.softmax))
             print(model.summary())
 
@@ -101,24 +84,23 @@ def main():
 
             if (val_acc >= 0.75):
                 print('Accuracy is good enough. Saving model')
-                """
-                model_json = model.to_json()
-                with open("model_pretrained.json", "w") as json_file:
-                    json_file.write(model_json)
 
-                model.save_weights("model_pretrained.h5")
-                """
                 model.save('sign_language.model')
-                print("Saved model to disk")
+                print("Model saved to disk")
     except Exception as e:
         print(e)
         return
-    print("Let's see if I can guess!")
+    print("Let's see if I can guess...")
+    print()
+    print()
+    print()
+    print()
     images = gds.loadLiveImages()
-    images = tf.keras.utils.normalize(images, axis=1)
-    precictions = model.predict(images)
-    print(np.argmax(precictions[0]))
-
+    images_norm = tf.keras.utils.normalize(images, axis=1)
+    precictions = model.predict(images_norm)
+    print(f'This sign represents the number {np.argmax(precictions[0])}')
+    print()
+    print()
     # plt.imshow(images[0], cmap=plt.cm.binary)
     # plt.show()
 
@@ -134,4 +116,3 @@ def load_model(file_name):
 
 
 main()
-
