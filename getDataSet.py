@@ -21,8 +21,9 @@ test_size = 0.2
 
 def get_img(data_path):
     # Getting image array from path:
-    # img = imread(data_path, flatten=grayscale_images)
-    img = Image.open(data_path).convert('L')
+
+    # img = Image.open(data_path).convert('L') # <-- Convert to greyscale
+    img = Image.open(data_path)
     img = img.resize((img_size, img_size))
     # img = imresize(img, (img_size, img_size, 1 if grayscale_images else 3))
     img = np.array(img)
@@ -68,3 +69,4 @@ def loadLiveImages(dataset_path='Live_Examples'):
 
 if __name__ == '__main__':
     get_dataset()
+
